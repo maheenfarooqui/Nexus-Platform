@@ -79,3 +79,20 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
 }
+export interface AvailabilitySlot {
+  id: string;
+  userId: string;       
+  start: string;      
+  end: string;          
+}
+
+export interface MeetingRequest {
+  id: string;
+  title: string;        
+  senderId: string;     
+  senderName: string;   
+  receiverId: string;  
+  start: string;
+  end: string;
+  status: 'pending' | 'accepted' | 'declined'; 
+}

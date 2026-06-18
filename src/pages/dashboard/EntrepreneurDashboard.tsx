@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Bell, Calendar, TrendingUp, AlertCircle, PlusCircle } from 'lucide-react';
+import { Users, Bell, Calendar, TrendingUp, AlertCircle, PlusCircle, Clock } from 'lucide-react'; // 🆕 Clock icon add kiya
 import { Button } from '../../components/ui/Button';
 import { Card, CardBody, CardHeader } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -10,11 +10,15 @@ import { useAuth } from '../../context/AuthContext';
 import { CollaborationRequest } from '../../types';
 import { getRequestsForEntrepreneur } from '../../data/collaborationRequests';
 import { investors } from '../../data/users';
+import { dummyMeetings } from '../../data/calendarData'; // 🆕 Dummy meetings import ho gaya
 
 export const EntrepreneurDashboard: React.FC = () => {
   const { user } = useAuth();
   const [collaborationRequests, setCollaborationRequests] = useState<CollaborationRequest[]>([]);
   const [recommendedInvestors, setRecommendedInvestors] = useState(investors.slice(0, 3));
+  
+  // 🆕 State to manage meetings dynamically
+  const [meetings, setMeetings] = useState(dummyMeetings);
   
   useEffect(() => {
     if (user) {
@@ -36,6 +40,9 @@ export const EntrepreneurDashboard: React.FC = () => {
   
   const pendingRequests = collaborationRequests.filter(req => req.status === 'pending');
   
+  // 🆕 Filter out confirmed meetings only
+  const confirmedMeetings = meetings.filter(m => m.status === 'accepted');
+  
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
@@ -45,9 +52,7 @@ export const EntrepreneurDashboard: React.FC = () => {
         </div>
         
         <Link to="/investors">
-          <Button
-            leftIcon={<PlusCircle size={18} />}
-          >
+          <Button leftIcon={<PlusCircle size={18} />}>
             Find Investors
           </Button>
         </Link>
@@ -85,6 +90,7 @@ export const EntrepreneurDashboard: React.FC = () => {
           </CardBody>
         </Card>
         
+        {/* 🆕 Dynamic Upcoming Meetings Card */}
         <Card className="bg-accent-50 border border-accent-100">
           <CardBody>
             <div className="flex items-center">
@@ -93,7 +99,9 @@ export const EntrepreneurDashboard: React.FC = () => {
               </div>
               <div>
                 <p className="text-sm font-medium text-accent-700">Upcoming Meetings</p>
-                <h3 className="text-xl font-semibold text-accent-900">2</h3>
+                <h3 className="text-xl font-semibold text-accent-900">
+                  {confirmedMeetings.length}
+                </h3>
               </div>
             </div>
           </CardBody>
@@ -147,8 +155,44 @@ export const EntrepreneurDashboard: React.FC = () => {
           </Card>
         </div>
         
-        {/* Recommended investors */}
+        {/* Right Sidebar Section */}
         <div className="space-y-4">
+          
+          {/* 🆕 NEW CARD: Confirmed Meetings List Dashboard Par */}
+          <Card>
+            <CardHeader className="flex justify-between items-center">
+              <h2 className="text-lg font-medium text-gray-900">Confirmed Meetings</h2>
+              <Link to="/calendar" className="text-sm font-medium text-primary-600 hover:text-primary-500">
+                Open Calendar
+              </Link>
+            </CardHeader>
+            
+            <CardBody className="space-y-3">
+              {confirmedMeetings.length > 0 ? (
+                confirmedMeetings.map(meeting => (
+                  <div 
+                    key={meeting.id} 
+                    className="p-3 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm transition"
+                  >
+                    <h4 className="font-medium text-sm text-gray-900">{meeting.title}</h4>
+                    <p className="text-xs text-gray-500 mt-0.5">With: {meeting.senderName}</p>
+                    
+                    <div className="flex items-center space-x-1 mt-2 text-gray-600">
+                      <Clock size={12} />
+                      <p className="text-xs">
+                        {new Date(meeting.start).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} at{' '}
+                        {new Date(meeting.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-4">No confirmed meetings scheduled.</p>
+              )}
+            </CardBody>
+          </Card>
+
+          {/* Recommended investors */}
           <Card>
             <CardHeader className="flex justify-between items-center">
               <h2 className="text-lg font-medium text-gray-900">Recommended Investors</h2>
@@ -167,6 +211,7 @@ export const EntrepreneurDashboard: React.FC = () => {
               ))}
             </CardBody>
           </Card>
+
         </div>
       </div>
     </div>
