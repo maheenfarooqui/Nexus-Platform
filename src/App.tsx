@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 
@@ -30,6 +30,7 @@ import { CalendarPage } from './pages/calendar/CalendarPage';
 
 // Chat Pages
 import { ChatPage } from './pages/chat/ChatPage';
+
 
 function App() {
   return (

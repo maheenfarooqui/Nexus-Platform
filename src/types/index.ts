@@ -96,3 +96,12 @@ export interface MeetingRequest {
   end: string;
   status: 'pending' | 'accepted' | 'declined'; 
 }
+export interface DealDocument {
+  id: string;
+  title: string;
+  size: string;
+  uploadedAt: string;
+  status: 'draft' | 'in-review' | 'signed'; // Sirf yehi 3 status allowed hain
+  senderName: string;
+  signatureData?: string; // Sign hone ke baad image ka base64 data yahan save hoga
+}

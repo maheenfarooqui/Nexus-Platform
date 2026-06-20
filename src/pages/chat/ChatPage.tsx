@@ -1,6 +1,7 @@
+// src/pages/chat/ChatPage.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Send, Phone, Video, Info, Smile } from 'lucide-react';
+import { Send, Phone, Video, Info, Smile, MessageCircle } from 'lucide-react';
 import { Avatar } from '../../components/ui/Avatar';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -10,7 +11,9 @@ import { useAuth } from '../../context/AuthContext';
 import { Message } from '../../types';
 import { findUserById } from '../../data/users';
 import { getMessagesBetweenUsers, sendMessage, getConversationsForUser } from '../../data/messages';
-import { MessageCircle } from 'lucide-react';
+
+// 🆕 VideoCallModal ko yahan import kiya
+import { VideoCallModal } from './VideoCallModal';
 
 export const ChatPage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -19,6 +22,9 @@ export const ChatPage: React.FC = () => {
   const [newMessage, setNewMessage] = useState('');
   const [conversations, setConversations] = useState<any[]>([]);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  
+  // 🆕 Modal ko control karne ke liye state variable
+  const [isCallActive, setIsCallActive] = useState(false);
   
   const chatPartner = userId ? findUserById(userId) : null;
   
@@ -101,11 +107,13 @@ export const ChatPage: React.FC = () => {
                   <Phone size={18} />
                 </Button>
                 
+                {/* 🆕 Video Call Button par onClick function map kar diya */}
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="rounded-full p-2"
+                  className="rounded-full p-2 text-primary-600 bg-primary-50 hover:bg-primary-100"
                   aria-label="Video call"
+                  onClick={() => setIsCallActive(true)}
                 >
                   <Video size={18} />
                 </Button>
@@ -191,6 +199,13 @@ export const ChatPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* 🆕 VideoCallModal overlay container placed globally inside parent layout */}
+      <VideoCallModal 
+        isOpen={isCallActive} 
+        onClose={() => setIsCallActive(false)} 
+        roomName={chatPartner ? `Meeting with ${chatPartner.name}` : "Business Room"}
+      />
     </div>
   );
 };
